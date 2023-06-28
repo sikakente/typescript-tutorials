@@ -1,12 +1,12 @@
 import express, {
   Express,
-  Request,
-  Response,
 } from 'express';
 import dotenv from 'dotenv';
 import { DataSource } from 'typeorm';
 import cors from 'cors';
 import bodyParser from 'body-parser';
+import { Task } from './src/tasks/tasks.entity';
+import { tasksRouter } from './src/tasks/tasks.router';
 
 // Instantiate the express app
 const app: Express = express();
@@ -25,16 +25,12 @@ export const AppDataSource = new DataSource({
   username: process.env.MYSQL_USER,
   password: process.env.MYSQL_PASSWORD,
   database: process.env.MYSQL_DB,
+  entities: [Task],
   synchronize: true, // Tells TypeORM to delete databases: Do not use in Production
 });
 
 // Define server port
 const port = process.env.PORT;
-
-// Create a default route
-app.get('/', (req: Request, res: Response) => {
-  res.send('Express + TypeScript server');
-});
 
 AppDataSource.initialize()
   .then(() => {
@@ -47,3 +43,5 @@ AppDataSource.initialize()
       err,
     );
   });
+
+app.use('/', tasksRouter);
